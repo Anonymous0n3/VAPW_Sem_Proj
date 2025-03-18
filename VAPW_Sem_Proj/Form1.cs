@@ -214,9 +214,9 @@ namespace VAPW_Sem_Proj
             labelRoll.Text = $"Náklon: {point.Roll.ToString("0.0")}°";
 
             string accText;
-            if (point.Acceleration > 0)
+            if (point.Ax > 0)
                 accText = "Zrychluje";
-            else if (point.Acceleration < 0)
+            else if (point.Ax < 0)
                 accText = "Brzdí";
             else
                 accText = "Konstantní rychlost";

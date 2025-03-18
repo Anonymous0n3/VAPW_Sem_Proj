@@ -16,8 +16,6 @@ namespace VAPW_Sem_Proj
         private double scale;
         private double padding = 20;
 
-
-
         public Form1()
         {
             InitializeComponent();
@@ -99,18 +97,14 @@ namespace VAPW_Sem_Proj
             var g = e.Graphics;
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-            // === 1. ŠEDÁ ZÁKLADNÍ TRASA ===
+            // === 1. ZÁKLADNÍ TRASA ===
             PointF? prevPoint = null;
             for (int i = 0; i < validPoints.Count; i++)
             {
                 var point = validPoints[i];
                 double x = (point.LonRec.Value - minLon) * scale + padding;
                 double y = (maxLat - point.LatRec.Value) * scale + padding;
-                var currentPoint = new PointF((float)x, (float)y);
-
-                //Brush podle 
-
-                
+                var currentPoint = new PointF((float)x, (float)y);               
 
                 g.FillEllipse(new SolidBrush(Properties.Settings.Default.ColorDefault), currentPoint.X - 2, currentPoint.Y - 2, 4, 4);
 

@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.ApplicationServices;
 using System.Configuration;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using VAPW_Sem_Proj.Data;
 using VAPW_Sem_Proj.Data.Models;
@@ -238,37 +240,41 @@ namespace VAPW_Sem_Proj
             float width = rollPanel.Width;
             float height = rollPanel.Height;
 
-            // Střed panelu
             PointF center = new PointF(width / 2, height / 2);
-
-            // Délka ručičky
-            float needleLength = Math.Min(width, height) / 2 - 10;
-
-            // Úhel náklonu (v stupních) → převedeme na radiány
             float rollAngleDegrees = selectedDrivePoint.Roll;
-            float angleRad = (float)(-(rollAngleDegrees * Math.PI / 180));
 
-            // Výpočet koncového bodu ručičky
-            PointF endPoint = new PointF(
-                center.X + (float)(Math.Sin(-angleRad) * needleLength),
-                center.Y + (float)(-Math.Cos(angleRad) * needleLength)
-            );
-
-            // Vykreslení základního kruhu
-            g.DrawEllipse(Pens.Gray, center.X - needleLength, center.Y - needleLength, needleLength * 2, needleLength * 2);
-
-            // Vykreslení ručičky
-            using (Pen needlePen = new Pen(Color.DarkRed, 3))
+            try
             {
-                g.DrawLine(needlePen, center, endPoint);
+                using (Image bikeImage = Image.FromFile("C:\\Users\\42077\\source\\repos\\VAPW_Sem_Proj\\VAPW_Sem_Proj\\img\\motorcycle.jpg"))
+                {
+                    // Určení velikosti obrázku (zmenšení podle panelu)
+                    int imageSize = Math.Min(rollPanel.Width, rollPanel.Height) / 2;
+                    Rectangle destRect = new Rectangle((int)(center.X - imageSize / 2), (int)(center.Y - imageSize / 2), imageSize, imageSize);
+
+                    // Vytvoření transformační matice pro otočení obrázku
+                    using (Matrix matrix = new Matrix())
+                    {
+                        matrix.RotateAt(-rollAngleDegrees, center);
+                        g.Transform = matrix;
+
+                        // Vykreslení obrázku
+                        g.DrawImage(bikeImage, destRect);
+                    }
+
+                    // Reset transformace
+                    g.ResetTransform();
+                }
+            }
+            catch (Exception ex)
+            {
+                g.DrawString("Chyba načtení obrázku", this.Font, Brushes.Red, new PointF(10, 10));
             }
 
-            // Volitelně popisky (např. -90°, 0°, +90°)
             using (Font f = new Font(FontFamily.GenericSansSerif, 8))
             {
-                g.DrawString("-90°", f, Brushes.Black, center.X - needleLength - 10, center.Y - 8);
-                g.DrawString("0°", f, Brushes.Black, center.X - 10, center.Y - needleLength - 15);
-                g.DrawString("+90°", f, Brushes.Black, center.X + needleLength - 25, center.Y - 8);
+                g.DrawString("-90°", f, Brushes.Black, center.X - width / 2 + 10, center.Y);
+                g.DrawString("0°", f, Brushes.Black, center.X - 10, center.Y - height / 2 + 10);
+                g.DrawString("+90°", f, Brushes.Black, center.X + width / 2 - 25, center.Y);
             }
         }
 

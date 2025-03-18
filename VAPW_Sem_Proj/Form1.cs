@@ -104,7 +104,7 @@ namespace VAPW_Sem_Proj
                 var point = validPoints[i];
                 double x = (point.LonRec.Value - minLon) * scale + padding;
                 double y = (maxLat - point.LatRec.Value) * scale + padding;
-                var currentPoint = new PointF((float)x, (float)y);               
+                var currentPoint = new PointF((float)x, (float)y);
 
                 g.FillEllipse(new SolidBrush(Properties.Settings.Default.ColorDefault), currentPoint.X - 2, currentPoint.Y - 2, 4, 4);
 
@@ -173,12 +173,12 @@ namespace VAPW_Sem_Proj
 
         private void turnButton_CheckedChanged(object sender, EventArgs e)
         {
-                driveDraw.Invalidate();
+            driveDraw.Invalidate();
         }
 
         private void speedButton_CheckedChanged(object sender, EventArgs e)
         {
-                driveDraw.Invalidate();
+            driveDraw.Invalidate();
         }
 
         private void buttonSettings_Click(object sender, EventArgs e)
@@ -195,7 +195,7 @@ namespace VAPW_Sem_Proj
                     // Příklad – pokud chceš něco ihned přenést po zavření nastavení
                     // např. překreslit driveDraw panel nebo aplikovat barvy
                     ColorDialog colorDialog = new ColorDialog();
-                        driveDraw.Invalidate(); // překreslí trasu
+                    driveDraw.Invalidate(); // překreslí trasu
 
                     // Můžeš zde rovnou uložit barvy pro pozdější použití při vykreslení
                 }
@@ -272,7 +272,6 @@ namespace VAPW_Sem_Proj
             }
         }
 
-
         private void driveDraw_MouseClick(object sender, MouseEventArgs e)
         {
             if (currentDriveData == null || currentDriveData.Count == 0) return;
@@ -303,8 +302,6 @@ namespace VAPW_Sem_Proj
                 rollPanel.Invalidate();
             }
         }
-
-
 
     }
 }

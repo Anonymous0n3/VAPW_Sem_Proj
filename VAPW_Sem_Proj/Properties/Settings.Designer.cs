@@ -62,12 +62,24 @@ namespace VAPW_Sem_Proj.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Green")]
-        public global::System.Drawing.Color ColorAcceleration {
+        public global::System.Drawing.Color ColorAccelerationTop {
             get {
-                return ((global::System.Drawing.Color)(this["ColorAcceleration"]));
+                return ((global::System.Drawing.Color)(this["ColorAccelerationTop"]));
             }
             set {
-                this["ColorAcceleration"] = value;
+                this["ColorAccelerationTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Green")]
+        public global::System.Drawing.Color ColorAccelerationLow {
+            get {
+                return ((global::System.Drawing.Color)(this["ColorAccelerationLow"]));
+            }
+            set {
+                this["ColorAccelerationLow"] = value;
             }
         }
     }

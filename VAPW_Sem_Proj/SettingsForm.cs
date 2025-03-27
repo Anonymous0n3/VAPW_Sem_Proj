@@ -10,7 +10,8 @@ namespace VAPW_Sem_Proj
         private Color colorDefault;
         private Color colorTurnLeft;
         private Color colorTurnRight;
-        private Color colorAcceleration;
+        private Color colorAccelerationTop;
+        private Color colorAccelerationLow;
 
         public SettingsForm()
         {
@@ -23,12 +24,14 @@ namespace VAPW_Sem_Proj
             colorDefault = Properties.Settings.Default.ColorDefault;
             colorTurnLeft = Properties.Settings.Default.ColorTurnLeft;
             colorTurnRight = Properties.Settings.Default.ColorTurnRight;
-            colorAcceleration = Properties.Settings.Default.ColorAcceleration;
+            colorAccelerationTop = Properties.Settings.Default.ColorAccelerationTop;
+            colorAccelerationLow = Properties.Settings.Default.ColorAccelerationLow;
 
             btnColorDefault.BackColor = Properties.Settings.Default.ColorDefault;
             btnColorTurnLeft.BackColor = Properties.Settings.Default.ColorTurnLeft;
             btnColorTurnRight.BackColor = Properties.Settings.Default.ColorTurnRight;
-            btnColorAcceleration.BackColor = Properties.Settings.Default.ColorAcceleration;
+            btnColorAccelerationTop.BackColor = Properties.Settings.Default.ColorAccelerationTop;
+            btnColorAccelerationLow.BackColor = Properties.Settings.Default.ColorAccelerationLow;
         }
 
         private void SaveSettings()
@@ -36,7 +39,8 @@ namespace VAPW_Sem_Proj
             Properties.Settings.Default.ColorDefault = colorDefault;
             Properties.Settings.Default.ColorTurnLeft = colorTurnLeft;
             Properties.Settings.Default.ColorTurnRight = colorTurnRight;
-            Properties.Settings.Default.ColorAcceleration = colorAcceleration;
+            Properties.Settings.Default.ColorAccelerationTop = colorAccelerationTop;
+            Properties.Settings.Default.ColorAccelerationLow = colorAccelerationLow;
             Properties.Settings.Default.Save();
         }
 
@@ -68,9 +72,14 @@ namespace VAPW_Sem_Proj
             PickColor(btnColorTurnRight);
         }
 
-        private void buttonColorAcceleration_Click(object sender, EventArgs e)
+        private void buttonColorAccelerationTop_Click(object sender, EventArgs e)
         {
-            PickColor(btnColorAcceleration);
+            PickColor(btnColorAccelerationTop);
+        }
+
+        private void buttonColorAccelerationLow_Click(object sender, EventArgs e)
+        {
+            PickColor(btnColorAccelerationLow);
         }
 
         private void PickColor(Button button)
@@ -89,11 +98,12 @@ namespace VAPW_Sem_Proj
                         colorTurnLeft = colorDialog.Color;
                     else if (button == btnColorTurnRight)
                         colorTurnRight = colorDialog.Color;
-                    else if (button == btnColorAcceleration)
-                        colorAcceleration = colorDialog.Color;
+                    else if (button == btnColorAccelerationTop)
+                        colorAccelerationTop = colorDialog.Color;
+                    else if (button == btnColorAccelerationLow)
+                        colorAccelerationLow = colorDialog.Color;
                 }
             }
         }
-
     }
 }

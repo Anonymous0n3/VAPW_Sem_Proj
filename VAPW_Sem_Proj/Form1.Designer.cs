@@ -30,19 +30,24 @@
         {
             tableLayoutPanel1 = new TableLayoutPanel();
             panel1 = new Panel();
+            customPanelBox = new ComboBox();
             btnSettings = new Button();
             speedButton = new RadioButton();
             turnButton = new RadioButton();
             drives = new ComboBox();
-            driveDraw = new Panel();
             panel2 = new Panel();
             labelAcc = new Label();
             labelRoll = new Label();
             labelSpeed = new Label();
             rollPanel = new Panel();
+            driveTable = new TableLayoutPanel();
+            driveDraw3 = new VAPW_Sem_Proj.Component.UserControl1();
+            driveDraw2 = new VAPW_Sem_Proj.Component.UserControl1();
+            driveDraw1 = new VAPW_Sem_Proj.Component.UserControl1();
             tableLayoutPanel1.SuspendLayout();
             panel1.SuspendLayout();
             panel2.SuspendLayout();
+            driveTable.SuspendLayout();
             SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -52,8 +57,8 @@
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 60F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.Controls.Add(panel1, 0, 0);
-            tableLayoutPanel1.Controls.Add(driveDraw, 1, 0);
             tableLayoutPanel1.Controls.Add(panel2, 2, 0);
+            tableLayoutPanel1.Controls.Add(driveTable, 1, 0);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -64,6 +69,7 @@
             // 
             // panel1
             // 
+            panel1.Controls.Add(customPanelBox);
             panel1.Controls.Add(btnSettings);
             panel1.Controls.Add(speedButton);
             panel1.Controls.Add(turnButton);
@@ -73,6 +79,15 @@
             panel1.Name = "panel1";
             panel1.Size = new Size(154, 444);
             panel1.TabIndex = 2;
+            // 
+            // customPanelBox
+            // 
+            customPanelBox.FormattingEnabled = true;
+            customPanelBox.Location = new Point(3, 107);
+            customPanelBox.Margin = new Padding(2);
+            customPanelBox.Name = "customPanelBox";
+            customPanelBox.Size = new Size(129, 23);
+            customPanelBox.TabIndex = 4;
             // 
             // btnSettings
             // 
@@ -117,16 +132,6 @@
             drives.TabIndex = 0;
             drives.SelectedIndexChanged += drives_SelectedIndexChanged;
             // 
-            // driveDraw
-            // 
-            driveDraw.Dock = DockStyle.Fill;
-            driveDraw.Location = new Point(163, 3);
-            driveDraw.Name = "driveDraw";
-            driveDraw.Size = new Size(474, 444);
-            driveDraw.TabIndex = 3;
-            driveDraw.Paint += driveDraw_Paint;
-            driveDraw.MouseClick += driveDraw_MouseClick;
-            // 
             // panel2
             // 
             panel2.Controls.Add(labelAcc);
@@ -170,10 +175,68 @@
             // 
             rollPanel.Dock = DockStyle.Bottom;
             rollPanel.Location = new Point(0, 240);
+            rollPanel.Margin = new Padding(1);
             rollPanel.Name = "rollPanel";
+            rollPanel.Padding = new Padding(2);
             rollPanel.Size = new Size(154, 204);
             rollPanel.TabIndex = 0;
             rollPanel.Paint += rollPanel_Paint;
+            // 
+            // driveTable
+            // 
+            driveTable.AutoScroll = true;
+            driveTable.AutoSize = true;
+            driveTable.ColumnCount = 3;
+            driveTable.ColumnStyles.Add(new ColumnStyle());
+            driveTable.ColumnStyles.Add(new ColumnStyle());
+            driveTable.ColumnStyles.Add(new ColumnStyle());
+            driveTable.Controls.Add(driveDraw3, 2, 0);
+            driveTable.Controls.Add(driveDraw2, 1, 0);
+            driveTable.Controls.Add(driveDraw1, 0, 0);
+            driveTable.Dock = DockStyle.Fill;
+            driveTable.Location = new Point(162, 2);
+            driveTable.Margin = new Padding(2);
+            driveTable.Name = "driveTable";
+            driveTable.RowCount = 1;
+            driveTable.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+            driveTable.Size = new Size(476, 446);
+            driveTable.TabIndex = 5;
+            // 
+            // driveDraw3
+            // 
+            driveDraw3.Dock = DockStyle.Fill;
+            driveDraw3.Location = new Point(318, 2);
+            driveDraw3.Margin = new Padding(2);
+            driveDraw3.Name = "driveDraw3";
+            driveDraw3.Size = new Size(156, 442);
+            driveDraw3.TabIndex = 8;
+            driveDraw3.Load += MainForm_Load;
+            driveDraw3.Paint += driveDraw_Paint;
+            driveDraw3.MouseClick += driveDraw_MouseClick;
+            // 
+            // driveDraw2
+            // 
+            driveDraw2.Dock = DockStyle.Fill;
+            driveDraw2.Location = new Point(160, 2);
+            driveDraw2.Margin = new Padding(2);
+            driveDraw2.Name = "driveDraw2";
+            driveDraw2.Size = new Size(154, 442);
+            driveDraw2.TabIndex = 7;
+            driveDraw2.Load += MainForm_Load;
+            driveDraw2.Paint += driveDraw_Paint;
+            driveDraw2.MouseClick += driveDraw_MouseClick;
+            // 
+            // driveDraw1
+            // 
+            driveDraw1.Dock = DockStyle.Fill;
+            driveDraw1.Location = new Point(2, 2);
+            driveDraw1.Margin = new Padding(2);
+            driveDraw1.Name = "driveDraw1";
+            driveDraw1.Size = new Size(154, 442);
+            driveDraw1.TabIndex = 6;
+            driveDraw1.Load += MainForm_Load;
+            driveDraw1.Paint += driveDraw_Paint;
+            driveDraw1.MouseClick += driveDraw_MouseClick;
             // 
             // Form1
             // 
@@ -181,14 +244,17 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
             Controls.Add(tableLayoutPanel1);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "Form1";
             Text = "Form1";
             Load += MainForm_Load;
             tableLayoutPanel1.ResumeLayout(false);
+            tableLayoutPanel1.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
             panel2.ResumeLayout(false);
             panel2.PerformLayout();
+            driveTable.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -199,12 +265,16 @@
         private RadioButton speedButton;
         private RadioButton turnButton;
         private ComboBox drives;
-        private Panel driveDraw;
         private Panel panel2;
         private Panel rollPanel;
         private Label labelAcc;
         private Label labelRoll;
         private Label labelSpeed;
         private Button btnSettings;
+        private TableLayoutPanel driveTable;
+        private Component.UserControl1 driveDraw2;
+        private Component.UserControl1 driveDraw1;
+        private ComboBox customPanelBox;
+        private Component.UserControl1 driveDraw3;
     }
 }

@@ -11,7 +11,10 @@
     <Setting Name="ColorTurnRight" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Red</Value>
     </Setting>
-    <Setting Name="ColorAcceleration" Type="System.Drawing.Color" Scope="User">
+    <Setting Name="ColorAccelerationTop" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">Green</Value>
+    </Setting>
+    <Setting Name="ColorAccelerationLow" Type="System.Drawing.Color" Scope="User">
       <Value Profile="(Default)">Green</Value>
     </Setting>
   </Settings>

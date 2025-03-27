@@ -3,6 +3,7 @@ using Microsoft.VisualBasic.ApplicationServices;
 using System.Configuration;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using VAPW_Sem_Proj.Component;
 using VAPW_Sem_Proj.Data;
 using VAPW_Sem_Proj.Data.Models;
 
@@ -19,8 +20,41 @@ namespace VAPW_Sem_Proj
         public Form1()
         {
             InitializeComponent();
+            LoadPanelNames(getPanels());
             dbContext = new VAPW_PS_DrivesContext(ConfigurationManager.ConnectionStrings["Pripojeni"].ConnectionString);
 
+            // Získání rozlišení hlavní obrazovky
+            int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+            // Nastavení velikosti na polovinu rozlišení
+            this.Size = new Size((screenWidth * 3) / 4, (screenHeight * 3) / 4);
+
+            // Zakázání změny velikosti
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+
+        }
+
+        private void LoadPanelNames(List<UserControl1> panels)
+        {
+            foreach (UserControl1 panel in panels)
+            {
+                customPanelBox.Items.Add(panel.Name);
+            }
+        }
+
+        private List<UserControl1> getPanels()
+        {
+            List<UserControl1> panels = new List<UserControl1>();
+            foreach (Control control in driveTable.Controls)
+            {
+                if (control is UserControl1 userControl1)
+                {
+                    panels.Add(userControl1);
+                }
+            }
+            return panels;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -47,12 +81,11 @@ namespace VAPW_Sem_Proj
                     .OrderBy(d => d.TimeFromStartSeconds)
                     .ToList();
 
-                MessageBox.Show($"Načteno {currentDriveData.Count} bodů pro záznam ID {selected.Id}");
 
-                driveDraw.Invalidate(); // překresli
+                if (customPanelBox.SelectedItem != null) invalidate_Panel();
+
             }
         }
-
 
         private void driveDraw_Paint(object sender, PaintEventArgs e)
         {
@@ -77,6 +110,7 @@ namespace VAPW_Sem_Proj
             maxLat = validPoints.Max(p => p.LatRec.Value);
             minLon = validPoints.Min(p => p.LonRec.Value);
             maxLon = validPoints.Max(p => p.LonRec.Value);
+            float topSpeed = validPoints.Max(p => p.SpeedRec.Value);
 
             double latRange = maxLat - minLat;
             double lonRange = maxLon - minLon;
@@ -87,8 +121,8 @@ namespace VAPW_Sem_Proj
                 return;
             }
 
-            double panelWidth = driveDraw.Width - 2 * padding;
-            double panelHeight = driveDraw.Height - 2 * padding;
+            double panelWidth = driveDraw1.Width - 2 * padding;
+            double panelHeight = driveDraw1.Height - 2 * padding;
 
             double scaleX = panelWidth / lonRange;
             double scaleY = panelHeight / latRange;
@@ -99,23 +133,25 @@ namespace VAPW_Sem_Proj
 
             // === 1. ZÁKLADNÍ TRASA ===
             PointF? prevPoint = null;
-            for (int i = 0; i < validPoints.Count; i++)
+            if (!turnButton.Checked && !speedButton.Checked)
             {
-                var point = validPoints[i];
-                double x = (point.LonRec.Value - minLon) * scale + padding;
-                double y = (maxLat - point.LatRec.Value) * scale + padding;
-                var currentPoint = new PointF((float)x, (float)y);
-
-                g.FillEllipse(new SolidBrush(Properties.Settings.Default.ColorDefault), currentPoint.X - 2, currentPoint.Y - 2, 4, 4);
-
-                if (prevPoint != null)
+                for (int i = 0; i < validPoints.Count; i++)
                 {
-                    g.DrawLine(new Pen(Properties.Settings.Default.ColorDefault, 2), prevPoint.Value, currentPoint);
+                    var point = validPoints[i];
+                    double x = (point.LonRec.Value - minLon) * scale + padding;
+                    double y = (maxLat - point.LatRec.Value) * scale + padding;
+                    var currentPoint = new PointF((float)x, (float)y);
+
+                    g.FillEllipse(new SolidBrush(Properties.Settings.Default.ColorDefault), currentPoint.X - 2, currentPoint.Y - 2, 4, 4);
+
+                    if (prevPoint != null)
+                    {
+                        g.DrawLine(new Pen(Properties.Settings.Default.ColorDefault, 2), prevPoint.Value, currentPoint);
+                    }
+
+                    prevPoint = currentPoint;
                 }
-
-                prevPoint = currentPoint;
             }
-
             // === 2. ZVÝRAZNĚNÍ ÚSEKŮ PODLE REŽIMU ===
             prevPoint = null;
             for (int i = 0; i < validPoints.Count; i++)
@@ -141,7 +177,7 @@ namespace VAPW_Sem_Proj
                     else if (speedButton.Checked)
                     {
                         float acc = point.SpeedRec.Value;
-                        pen = new Pen(SpeedToColor(acc), 2);
+                        pen = new Pen(SpeedToColor(acc, topSpeed), 2);
                     }
                     else
                     {
@@ -158,27 +194,34 @@ namespace VAPW_Sem_Proj
             e.Graphics.DrawString("Trasa vykreslena", this.Font, Brushes.DarkGreen, new PointF(10, 10));
         }
 
-        private Color SpeedToColor(float speed)
+        private Color SpeedToColor(float speed, float maxSpeed)
         {
-            // Pomalá modrá → rychlá červená 30 km/h
-            Color color = Properties.Settings.Default.ColorAcceleration;
-            var argb = color.ToArgb();
-            int red = (argb >> 16) & 0xFF;
-            int green = (argb >> 8) & 0xFF;
-            int blue = argb & 0xFF;
+            // Pomalá modrá → rychlá červená
+            Color colorLow = Properties.Settings.Default.ColorAccelerationLow;
+            Color colorTop = Properties.Settings.Default.ColorAccelerationTop;
 
-            int alpha = (int)(50 + (speed / 30.0) * (255 - 50));
+            // Normalizace rychlosti mezi 0 a 1
+            float t = Math.Clamp(speed / maxSpeed, 0f, 1f);
+
+            // Interpolace mezi barvami
+            int red = (int)(colorLow.R + t * (colorTop.R - colorLow.R));
+            int green = (int)(colorLow.G + t * (colorTop.G - colorLow.G));
+            int blue = (int)(colorLow.B + t * (colorTop.B - colorLow.B));
+
+            // Interpolace průhlednosti (50 při 0 km/h, 255 při maxSpeed)
+            int alpha = (int)(50 + t * (255 - 50));
+
             return Color.FromArgb(alpha, red, green, blue);
         }
 
         private void turnButton_CheckedChanged(object sender, EventArgs e)
         {
-            driveDraw.Invalidate();
+            invalidate_Panel();
         }
 
         private void speedButton_CheckedChanged(object sender, EventArgs e)
         {
-            driveDraw.Invalidate();
+            invalidate_Panel();
         }
 
         private void buttonSettings_Click(object sender, EventArgs e)
@@ -195,7 +238,7 @@ namespace VAPW_Sem_Proj
                     // Příklad – pokud chceš něco ihned přenést po zavření nastavení
                     // např. překreslit driveDraw panel nebo aplikovat barvy
                     ColorDialog colorDialog = new ColorDialog();
-                    driveDraw.Invalidate(); // překreslí trasu
+                    invalidate_Panels() ; // překreslí trasu
 
                     // Můžeš zde rovnou uložit barvy pro pozdější použití při vykreslení
                 }
@@ -234,41 +277,37 @@ namespace VAPW_Sem_Proj
             float width = rollPanel.Width;
             float height = rollPanel.Height;
 
+            // Střed panelu
             PointF center = new PointF(width / 2, height / 2);
+
+            // Délka ručičky
+            float needleLength = Math.Min(width, height) / 2 - 10;
+
+            // Úhel náklonu (v stupních) → převedeme na radiány
             float rollAngleDegrees = selectedDrivePoint.Roll;
+            float angleRad = (float)(-(rollAngleDegrees * Math.PI / 180));
 
-            try
+            // Výpočet koncového bodu ručičky
+            PointF endPoint = new PointF(
+                center.X + (float)(Math.Sin(-angleRad) * needleLength),
+                center.Y + (float)(-Math.Cos(angleRad) * needleLength)
+            );
+
+            // Vykreslení základního kruhu
+            g.DrawEllipse(Pens.Gray, center.X - needleLength, center.Y - needleLength, needleLength * 2, needleLength * 2);
+
+            // Vykreslení ručičky
+            using (Pen needlePen = new Pen(Color.DarkRed, 3))
             {
-                using (Image bikeImage = Image.FromFile("C:\\Users\\42077\\source\\repos\\VAPW_Sem_Proj\\VAPW_Sem_Proj\\img\\motorcycle.jpg"))
-                {
-                    // Určení velikosti obrázku (zmenšení podle panelu)
-                    int imageSize = Math.Min(rollPanel.Width, rollPanel.Height) / 2;
-                    Rectangle destRect = new Rectangle((int)(center.X - imageSize / 2), (int)(center.Y - imageSize / 2), imageSize, imageSize);
-
-                    // Vytvoření transformační matice pro otočení obrázku
-                    using (Matrix matrix = new Matrix())
-                    {
-                        matrix.RotateAt(-rollAngleDegrees, center);
-                        g.Transform = matrix;
-
-                        // Vykreslení obrázku
-                        g.DrawImage(bikeImage, destRect);
-                    }
-
-                    // Reset transformace
-                    g.ResetTransform();
-                }
-            }
-            catch (Exception ex)
-            {
-                g.DrawString("Chyba načtení obrázku", this.Font, Brushes.Red, new PointF(10, 10));
+                g.DrawLine(needlePen, center, endPoint);
             }
 
+            // Volitelně popisky (např. -90°, 0°, +90°)
             using (Font f = new Font(FontFamily.GenericSansSerif, 8))
             {
-                g.DrawString("-90°", f, Brushes.Black, center.X - width / 2 + 10, center.Y);
-                g.DrawString("0°", f, Brushes.Black, center.X - 10, center.Y - height / 2 + 10);
-                g.DrawString("+90°", f, Brushes.Black, center.X + width / 2 - 25, center.Y);
+                g.DrawString("-90°", f, Brushes.Black, center.X - needleLength - 10, center.Y - 8);
+                g.DrawString("0°", f, Brushes.Black, center.X - 10, center.Y - needleLength - 15);
+                g.DrawString("+90°", f, Brushes.Black, center.X + needleLength - 25, center.Y - 8);
             }
         }
 
@@ -303,5 +342,25 @@ namespace VAPW_Sem_Proj
             }
         }
 
+        private void invalidate_Panel() 
+        {
+            // Překreslení panelu
+            string currentPanel = customPanelBox.SelectedItem.ToString();
+            foreach (UserControl1 panel in getPanels())
+            {
+                if (panel.Name.Equals(currentPanel))
+                {
+                    panel.Invalidate();
+                }
+            }
+        }
+
+        private void invalidate_Panels() 
+        {
+            foreach (UserControl1 panel in getPanels())
+            {
+                    panel.Invalidate();
+            }
+        }
     }
 }
